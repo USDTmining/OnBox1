@@ -1,5 +1,5 @@
 // ONBOX — production PWA service worker
-const VERSION = 'onbox-v6';
+const VERSION = 'onbox-v7';
 const STATIC_CACHE = `${VERSION}-static`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
