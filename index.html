@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="ONBOX — discover movies and TV shows, build your watchlist, and explore AI-powered entertainment features.">
+    <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f2f4f8" media="(prefers-color-scheme: light)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="OnBox">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="OnBox">
+
+    <title>OnBox - Movies & TV Shows</title>
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="msapplication-TileColor" content="#0a0a0f">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="liquid-glass.css">
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body data-theme="dark">
+    <!-- ONBOX branded launch splash. It appears immediately on cold starts and fades into the app. -->
+    <div id="onbox-splash" class="onbox-splash" aria-label="ONBOX loading" role="status">
+        <div class="splash-glow splash-glow-one"></div>
+        <div class="splash-glow splash-glow-two"></div>
+        <div class="splash-content">
+            <img src="assets/icon-512.png" class="splash-logo" width="160" height="160" alt="ONBOX">
+            <div class="splash-wordmark">ON<span>BOX</span></div>
+            <div class="splash-tagline">MOVIES · SERIES · AI · STREAM</div>
+            <div class="splash-loader" aria-hidden="true"><span></span></div>
+        </div>
+    </div>
+    <div class="app">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="mobile-logo" onclick="navigateTo('home')">
+                <img class="logo-mark" src="assets/icon-192.png" alt="" width="40" height="40">
+                <span class="logo-text">On<span>Box</span></span>
+            </div>
+            <div class="mobile-actions">
+                <button class="mobile-icon-btn" onclick="ReportManager.show()" title="Report Issue">
+                    <i class="fas fa-flag"></i>
+                </button>
+                <button class="mobile-icon-btn" onclick="NotificationManager.subscribe()" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="mobile-notif-badge"></span>
+                </button>
+                <button class="mobile-icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-moon" id="mobile-theme-icon"></i>
+                </button>
+                <button class="mobile-icon-btn" id="mobile-login-btn" onclick="showAuthModal()" title="Account">
+                    <i class="fas fa-user"></i>
+                </button>
+                <div class="mobile-user-avatar" id="mobile-user-avatar" onclick="showAuthModal()" style="display:none">
+                    <span id="mobile-user-initial">U</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside class="sidebar">
+            <div class="sidebar-logo" onclick="navigateTo('home')">
+                <img class="logo-mark" src="assets/icon-192.png" alt="" width="40" height="40">
+                <span class="logo-text">On<span>Box</span></span>
+            </div>
+
+            <nav class="nav-items">
+                <a class="nav-item active" data-page="home" onclick="navigateTo('home')">
+                    <div class="nav-icon-wrap"><i class="fas fa-home"></i></div>
+                    <span class="nav-label">Home</span>
+                </a>
+                <a class="nav-item" data-page="discover" onclick="navigateTo('discover')">
+                    <div class="nav-icon-wrap"><i class="fas fa-compass"></i></div>
+                    <span class="nav-label">Discover</span>
+                </a>
+                <a class="nav-item" data-page="search" onclick="navigateTo('search')">
+                    <div class="nav-icon-wrap"><i class="fas fa-search"></i></div>
+                    <span class="nav-label">Search</span>
+                </a>
+                <a class="nav-item" data-page="library" onclick="navigateTo('library')">
+                    <div class="nav-icon-wrap"><i class="fas fa-bookmark"></i></div>
+                    <span class="nav-label">Library</span>
+                </a>
+                <a class="nav-item" data-page="tv" onclick="navigateTo('tv')">
+                    <div class="nav-icon-wrap"><i class="fas fa-tv"></i></div>
+                    <span class="nav-label">TV Shows</span>
+                </a>
+                <a class="nav-item" data-page="ai" onclick="navigateTo('ai')">
+                    <div class="nav-icon-wrap"><i class="fas fa-sparkles"></i></div>
+                    <span class="nav-label">AI Generator</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="sidebar-divider"></div>
+                <button class="nav-item" onclick="ReportManager.show()">
+                    <div class="nav-icon-wrap"><i class="fas fa-flag"></i></div>
+                    <span class="nav-label">Report Issue</span>
+                </button>
+                <button class="nav-item" onclick="toggleTheme()">
+                    <div class="nav-icon-wrap"><i class="fas fa-moon" id="theme-icon"></i></div>
+                    <span class="nav-label">Theme</span>
+                </button>
+                <button class="nav-item" id="auth-nav-item" onclick="showAuthModal()">
+                    <div class="nav-icon-wrap"><i class="fas fa-user"></i></div>
+                    <span class="nav-label">Account</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar (Desktop) -->
+            <header class="top-navbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Search movies, TV shows..." autocomplete="off">
+                    <span class="search-shortcut">⌘K</span>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-btn" onclick="ReportManager.show()" title="Report Issue">
+                        <i class="fas fa-flag"></i>
+                    </button>
+                    <button class="icon-btn notification-btn" onclick="NotificationManager.subscribe()" title="Enable notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notif-badge" id="desktop-notif-badge"></span>
+                    </button>
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                        <i class="fas fa-moon" id="top-theme-icon"></i>
+                    </button>
+                    <div class="user-avatar" id="user-avatar" onclick="showAuthModal()" style="display:none" title="Account">
+                        <span id="user-initial">U</span>
+                    </div>
+                    <button class="icon-btn" id="login-btn" onclick="showAuthModal()" title="Sign In">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Pages Container -->
+            <div id="pages-container">
+
+                <!-- HOME PAGE -->
+                <div class="page active" id="page-home">
+                    <div class="content">
+                        <!-- Hero Section -->
+                        <div class="hero" id="hero-section">
+                            <div class="hero-slides" id="hero-slides"></div>
+                            <div class="hero-overlay"></div>
+                            <div class="hero-content">
+                                <div class="hero-badge" id="hero-badge">
+                                    <i class="fas fa-fire"></i> Trending Now
+                                </div>
+                                <h1 class="hero-title" id="hero-title">Loading...</h1>
+                                <div class="hero-meta" id="hero-meta"></div>
+                                <p class="hero-desc" id="hero-desc"></p>
+                                <div class="hero-actions">
+                                    <button class="btn btn-primary" id="hero-play" onclick="playFeatured()">
+                                        <i class="fas fa-play"></i> Play Now
+                                    </button>
+                                    <button class="btn btn-secondary" id="hero-info" onclick="showFeaturedDetail()">
+                                        <i class="fas fa-info-circle"></i> More Info
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hero-indicators" id="hero-indicators"></div>
+                        </div>
+
+                        <!-- Continue Watching -->
+                        <div class="section" id="continue-watching-section" style="display:none">
+                            <div class="section-header">
+                                <h2 class="section-title"><i class="fas fa-history" style="margin-right:8px;opacity:.8"></i>Continue Watching</h2>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('continue-watching', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel continue-carousel" id="continue-watching"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('continue-watching', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Ad Banner 1 -->
+                        <div class="ad-banner ad-banner-home">
+                            <div class="ad-content">
+                                <div class="ad-text">🔥 Premium Streaming — 50% OFF</div>
+                                <div class="ad-sub">Upgrade now and enjoy ad-free experience in full HD</div>
+                            </div>
+                            <button class="ad-btn" onclick="UI.showToast('Premium upgrade coming soon','info')">Learn More</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+
+                        <!-- Today's Trending -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2 class="section-title">Today's Trending</h2>
+                                <a class="see-all" onclick="navigateTo('discover')">See All <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('trending-today', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="trending-today"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('trending-today', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Ad Banner 2 -->
+                        <div class="ad-banner ad-banner-home">
+                            <div class="ad-content">
+                                <div class="ad-text">📱 Watch on Any Device, Anywhere</div>
+                                <div class="ad-sub">Install our PWA for the best mobile experience</div>
+                            </div>
+                            <button class="ad-btn" onclick="InstallManager.install()" id="installBtn">Install</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+
+                        <!-- This Week's Trending -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2 class="section-title">This Week's Trending</h2>
+                                <a class="see-all" onclick="navigateTo('discover')">See All <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('trending-week', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="trending-week"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('trending-week', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Popular Movies -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2 class="section-title">Popular Movies</h2>
+                                <a class="see-all" onclick="navigateTo('discover')">See All <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('popular', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="popular"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('popular', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Now Playing -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2 class="section-title">Now Playing</h2>
+                                <a class="see-all" onclick="navigateTo('discover')">See All <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('now-playing', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="now-playing"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('now-playing', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Ad Banner 3 -->
+                        <div class="ad-banner ad-banner-home">
+                            <div class="ad-content">
+                                <div class="ad-text">🍿 New Releases Dropping Daily</div>
+                                <div class="ad-sub">Stay updated with the latest blockbusters & binge-worthy series</div>
+                            </div>
+                            <button class="ad-btn" onclick="navigateTo('discover')">Explore</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+
+                        <!-- Top Rated -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2 class="section-title">Top Rated</h2>
+                                <a class="see-all" onclick="navigateTo('discover')">See All <i class="fas fa-chevron-right"></i></a>
+                            </div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('top-rated', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="top-rated"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('top-rated', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISCOVER PAGE -->
+                <div class="page" id="page-discover">
+                    <div class="page-header">
+                        <h1>Discover</h1>
+                        <div class="content-tabs">
+                            <button class="content-tab active" data-type="movie" onclick="setContentType('movie')">Movies</button>
+                            <button class="content-tab" data-type="tv" onclick="setContentType('tv')">TV Shows</button>
+                        </div>
+                        <div class="filter-chips" id="discover-filters">
+                            <button class="filter-chip active" data-filter="discover" onclick="setFilter('discover')">Discover</button>
+                            <button class="filter-chip" data-filter="todayTrending" onclick="setFilter('todayTrending')">Trending Today</button>
+                            <button class="filter-chip" data-filter="thisWeekTrending" onclick="setFilter('thisWeekTrending')">Trending Week</button>
+                            <button class="filter-chip" data-filter="popular" onclick="setFilter('popular')">Popular</button>
+                            <button class="filter-chip" data-filter="nowPlaying" onclick="setFilter('nowPlaying')">Now Playing</button>
+                            <button class="filter-chip" data-filter="upcoming" onclick="setFilter('upcoming')">Upcoming</button>
+                            <button class="filter-chip" data-filter="topRated" onclick="setFilter('topRated')">Top Rated</button>
+                        </div>
+                    </div>
+                    <!-- Ad Banner Discover -->
+                    <div class="content">
+                        <div class="ad-banner">
+                            <div class="ad-content">
+                                <div class="ad-text">⚡ Lightning Fast Streaming</div>
+                                <div class="ad-sub">Zero buffering with our new global CDN network</div>
+                            </div>
+                            <button class="ad-btn" onclick="UI.showToast('Already using best servers','success')">Active</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+                        <div class="movie-grid" id="discover-grid"></div>
+                        <div class="pagination" id="discover-pagination"></div>
+                    </div>
+                </div>
+
+                <!-- TV SHOWS PAGE -->
+                <div class="page" id="page-tv">
+                    <div class="page-header">
+                        <h1>TV Shows</h1>
+                        <p>Stream the best TV series and shows</p>
+                        <div class="filter-chips" id="tv-filters">
+                            <button class="filter-chip active" data-filter="popular" onclick="TVPage.setFilter('popular')">Popular</button>
+                            <button class="filter-chip" data-filter="topRated" onclick="TVPage.setFilter('topRated')">Top Rated</button>
+                            <button class="filter-chip" data-filter="onTheAir" onclick="TVPage.setFilter('onTheAir')">On The Air</button>
+                            <button class="filter-chip" data-filter="airingToday" onclick="TVPage.setFilter('airingToday')">Airing Today</button>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <!-- Ad Banner TV -->
+                        <div class="ad-banner">
+                            <div class="ad-content">
+                                <div class="ad-text">📺 Binge-Watch Ready</div>
+                                <div class="ad-sub">Complete seasons available instantly — no waiting</div>
+                            </div>
+                            <button class="ad-btn" onclick="navigateTo('discover')">Browse</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+                        <div class="movie-grid" id="tv-grid"></div>
+                        <div class="pagination" id="tv-pagination"></div>
+                    </div>
+                </div>
+
+                <!-- SEARCH PAGE -->
+                <div class="page" id="page-search">
+                    <div class="page-header">
+                        <h1>Search</h1>
+                        <p id="search-subtitle">Find your favorite movies and TV shows</p>
+                    </div>
+                    <div class="content">
+                        <div class="search-page-bar" id="search-page-bar">
+                            <div class="search-box mobile-search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="page-search-input" placeholder="Search movies, TV shows..." autocomplete="off">
+                                <button class="search-clear-btn" id="search-clear" onclick="SearchPage.clearSearch()" style="display:none">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Ad Banner Search -->
+                        <div class="ad-banner">
+                            <div class="ad-content">
+                                <div class="ad-text">🔍 Can't Find Something?</div>
+                                <div class="ad-sub">Request any movie or show — we add new content daily</div>
+                            </div>
+                            <button class="ad-btn" onclick="UI.showToast('Request feature coming soon','info')">Request</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+                        <div class="movie-grid" id="search-grid"></div>
+                        <div class="no-results" id="search-empty" style="display:none">
+                            <i class="fas fa-search"></i>
+                            <h3>No results found</h3>
+                            <p>Try searching with different keywords</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIBRARY PAGE -->
+                <div class="page" id="page-library">
+                    <div class="page-header">
+                        <h1>My Library</h1>
+                        <p>Your saved movies and TV shows</p>
+                    </div>
+                    <div class="content">
+                        <!-- Ad Banner Library -->
+                        <div class="ad-banner">
+                            <div class="ad-content">
+                                <div class="ad-text">💾 Sync Your Library</div>
+                                <div class="ad-sub">Sign in to backup your watchlist across all devices</div>
+                            </div>
+                            <button class="ad-btn" onclick="showAuthModal()">Sign In</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+                        <div class="movie-grid" id="library-grid"></div>
+                        <div class="library-empty" id="library-empty">
+                            <i class="fas fa-bookmark"></i>
+                            <h3>Your library is empty</h3>
+                            <p>Save movies and TV shows to watch later</p>
+                            <button class="btn btn-primary mt-4" onclick="navigateTo('discover')">
+                                <i class="fas fa-compass"></i> Discover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI GENERATOR PAGE -->
+                <div class="page" id="page-ai">
+                    <div class="ai-hero">
+                        <div class="ai-hero-bg"></div>
+                        <div class="ai-hero-content">
+                            <div class="ai-badge"><i class="fas fa-sparkles"></i> Powered by Advanced AI</div>
+                            <h1 class="ai-title">AI Movie Generator</h1>
+                            <p class="ai-desc">Describe your dream movie and watch our AI bring it to life. Characters, scenes, dialogues — generated in seconds.</p>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="ai-coming-soon-badge">
+                            <i class="fas fa-rocket"></i> Coming Soon
+                        </div>
+                        <div class="ai-prompt-box">
+                            <label class="ai-label">Describe your movie</label>
+                            <textarea id="ai-prompt" class="ai-input" rows="4" placeholder="A sci-fi thriller about a lone astronaut who discovers a sentient AI on a distant moon..."></textarea>
+                            <div class="ai-hint">
+                                <i class="fas fa-lightbulb"></i> Try: genre, setting, main character, plot twist
+                            </div>
+                            <button class="btn btn-primary btn-lg ai-generate-btn" id="ai-generate-btn">
+                                <i class="fas fa-wand-magic-sparkles"></i> Generate Movie
+                            </button>
+                        </div>
+
+                        <!-- Ad Banner AI -->
+                        <div class="ad-banner">
+                            <div class="ad-content">
+                                <div class="ad-text">🤖 Be the First to Try AI Movies</div>
+                                <div class="ad-sub">Join the waitlist and get 100 free credits at launch</div>
+                            </div>
+                            <button class="ad-btn" onclick="UI.showToast('Waitlist joined!','success')">Join Waitlist</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+
+                        <div class="ai-features">
+                            <div class="ai-feature">
+                                <div class="ai-feature-icon"><i class="fas fa-film"></i></div>
+                                <h4>Full Scenes</h4>
+                                <p>Generate complete cinematic sequences from your prompt</p>
+                            </div>
+                            <div class="ai-feature">
+                                <div class="ai-feature-icon"><i class="fas fa-users"></i></div>
+                                <h4>Custom Characters</h4>
+                                <p>Create unique characters with distinct personalities</p>
+                            </div>
+                            <div class="ai-feature">
+                                <div class="ai-feature-icon"><i class="fas fa-music"></i></div>
+                                <h4>Original Soundtrack</h4>
+                                <p>AI-composed scores that match your movie's mood</p>
+                            </div>
+                            <div class="ai-feature">
+                                <div class="ai-feature-icon"><i class="fas fa-closed-captioning"></i></div>
+                                <h4>Auto Subtitles</h4>
+                                <p>Generated dialogue and multi-language subtitles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETAIL PAGE -->
+                <div class="page" id="page-detail">
+                    <div class="detail-hero">
+                        <div class="backdrop" id="detail-backdrop"></div>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-poster">
+                            <img id="detail-poster-img" src="" alt="" loading="eager">
+                        </div>
+                        <div class="detail-info">
+                            <span class="detail-type-badge" id="detail-type">Movie</span>
+                            <h1 class="detail-title" id="detail-title">Loading...</h1>
+                            <div class="detail-meta">
+                                <div class="rating-large"><i class="fas fa-star"></i><span id="detail-rating">0.0</span></div>
+                                <span class="badge" id="detail-year">2024</span>
+                                <span class="badge" id="detail-runtime">2h 30m</span>
+                                <span class="badge" id="detail-episodes" style="display:none"></span>
+                            </div>
+                            <div class="genre-tags" id="detail-genres"></div>
+                            <div class="detail-actions">
+                                <button class="btn btn-primary" onclick="playCurrent()">
+                                    <i class="fas fa-play"></i> Play Now
+                                </button>
+                                <button class="btn btn-watchlist" id="detail-watchlist-btn" onclick="toggleWatchlistCurrent()">
+                                    <i class="fas fa-bookmark"></i> Add to Watchlist
+                                </button>
+                                <button class="btn btn-secondary" onclick="shareCurrent()">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                            </div>
+                            <p class="detail-overview" id="detail-overview"></p>
+                            <div class="stats-row">
+                                <div class="stat">
+                                    <div class="stat-value" id="detail-status">Released</div>
+                                    <div class="stat-label">Status</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value" id="detail-budget">-</div>
+                                    <div class="stat-label">Budget</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value" id="detail-revenue">-</div>
+                                    <div class="stat-label">Revenue</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value" id="detail-votes">0</div>
+                                    <div class="stat-label">Votes</div>
+                                </div>
+                            </div>
+                            <!-- Seasons for TV -->
+                            <div class="seasons-section" id="seasons-section" style="display:none">
+                                <h3>Seasons</h3>
+                                <div class="seasons-grid" id="seasons-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-sections">
+                        <!-- Ad Banner Detail -->
+                        <div class="ad-banner ad-banner-detail">
+                            <div class="ad-content">
+                                <div class="ad-text">🎬 Watch Without Interruptions</div>
+                                <div class="ad-sub">Our smart server auto-switches for the best experience</div>
+                            </div>
+                            <button class="ad-btn" onclick="UI.showToast('Smart Stream is active','success')">Active</button>
+                            <span class="ad-label">Ad</span>
+                        </div>
+                        <div class="section">
+                            <div class="section-header"><h2 class="section-title">Top Cast</h2></div>
+                            <div class="cast-grid" id="detail-cast"></div>
+                        </div>
+                        <div class="section" id="related-section">
+                            <div class="section-header"><h2 class="section-title">More Like This</h2></div>
+                            <div class="carousel-container">
+                                <button class="carousel-nav prev" onclick="scrollCarousel('related', -1)"><i class="fas fa-chevron-left"></i></button>
+                                <div class="carousel" id="related"></div>
+                                <button class="carousel-nav next" onclick="scrollCarousel('related', 1)"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Nav (Mobile) -->
+        <nav class="bottom-nav">
+            <a class="bottom-nav-item active" data-page="home" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a class="bottom-nav-item" data-page="discover" onclick="navigateTo('discover')">
+                <i class="fas fa-compass"></i>
+                <span>Discover</span>
+            </a>
+            <a class="bottom-nav-item" data-page="search" onclick="navigateTo('search')">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a class="bottom-nav-item" data-page="tv" onclick="navigateTo('tv')">
+                <i class="fas fa-tv"></i>
+                <span>TV</span>
+            </a>
+            <a class="bottom-nav-item" data-page="ai" onclick="navigateTo('ai')">
+                <i class="fas fa-sparkles"></i>
+                <span>AI</span>
+            </a>
+            <a class="bottom-nav-item" data-page="library" onclick="navigateTo('library')">
+                <i class="fas fa-bookmark"></i>
+                <span>Library</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Install Banner -->
+    <div class="install-banner" id="install-banner">
+        <div class="install-banner-content">
+            <div class="install-banner-icon">🎬</div>
+            <div class="install-banner-text" id="install-text">
+                <strong>Install OnBox</strong> - Add to your home screen for the best experience
+            </div>
+        </div>
+        <div class="install-banner-actions">
+            <button class="install-banner-btn" id="install-btn" onclick="InstallManager.install()">
+                <i class="fas fa-download"></i> Install
+            </button>
+            <button class="install-banner-close" onclick="InstallManager.dismiss()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <div class="modal-logo">🎬 On<span>Box</span></div>
+                <h2 id="auth-title">Welcome Back</h2>
+                <p id="auth-subtitle">Sign in to access your library</p>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn" onclick="UI.showToast('Google sign-in coming soon', 'info')">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button class="social-btn" onclick="UI.showToast('GitHub sign-in coming soon', 'info')">
+                    <i class="fab fa-github"></i> GitHub
+                </button>
+            </div>
+
+            <div class="divider-text">or continue with email</div>
+
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" id="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+            <div class="modal-footer">
+                <span id="auth-footer-text">Don't have an account?</span>
+                <a onclick="toggleAuthMode()" id="auth-toggle">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Modal (Enhanced with Source Switcher) -->
+    <div class="player-modal" id="player-modal">
+        <div class="player-wrapper">
+            <button class="player-close" onclick="closePlayer()"><i class="fas fa-times"></i></button>
+            <div class="player-status" id="player-status">Connecting to best server...</div>
+            <div class="player-container">
+                <iframe id="player-iframe" src="" allowfullscreen allow="autoplay; fullscreen; picture-in-picture; encrypted-media"></iframe>
+            </div>
+            <div class="player-title" id="player-title"></div>
+            <div class="player-controls-bar">
+                <div class="player-source-info">
+                    <span class="player-source-badge" id="player-source-name">2Embed</span>
+                    <span class="player-source-counter" id="player-source-counter">1 / 15</span>
+                </div>
+                <div class="player-controls-right">
+                    <button class="btn btn-sm btn-ghost" onclick="PlayerManager.prevSource()" title="Previous Source">
+                        <i class="fas fa-chevron-left"></i> Prev
+                    </button>
+                    <button class="btn btn-sm btn-ghost" onclick="PlayerManager.switchSource()" title="Next Source">
+                        <i class="fas fa-sync-alt"></i> Switch Source
+                    </button>
+                    <button class="btn btn-sm btn-ghost" onclick="PlayerManager.toggleFullscreen()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div class="modal-overlay" id="download-modal">
+        <div class="modal modal-wide">
+            <button class="modal-close" onclick="DownloadManager.close()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <div class="modal-logo"><i class="fas fa-download"></i> Download</div>
+                <h2 id="download-title">Download</h2>
+                <p>Choose a download source below</p>
+            </div>
+            <div class="download-links" id="download-links"></div>
+        </div>
+    </div>
+
+    <!-- Report Issue Modal -->
+    <div class="modal-overlay" id="report-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="ReportManager.hide()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <div class="modal-logo"><i class="fas fa-flag"></i> Report Issue</div>
+                <h2>Report a Problem</h2>
+                <p>Help us improve OnBox by reporting issues</p>
+            </div>
+            <form id="report-form" onsubmit="ReportManager.submit(event)">
+                <div class="form-group">
+                    <label>Your Name (optional)</label>
+                    <input type="text" id="report-name" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Your Email (optional)</label>
+                    <input type="email" id="report-email" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    <select id="report-type" style="width:100%;padding:14px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none;">
+                        <option value="bug">🐛 Bug / Something not working</option>
+                        <option value="video">🎬 Video won't play / Buffering</option>
+                        <option value="download">📥 Download not working</option>
+                        <option value="request">🎥 Request a Movie / TV Show</option>
+                        <option value="feature">✨ Feature Request</option>
+                        <option value="other">📝 Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Describe the Issue *</label>
+                    <textarea id="report-message" rows="4" placeholder="Please describe what happened, which movie/show, and what you expected..." required style="width:100%;padding:14px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-family:var(--font-body);font-size:14px;outline:none;resize:vertical;min-height:100px;box-shadow:inset 2px 2px 5px var(--neu-shadow-dark),inset -2px -2px 5px var(--neu-shadow-light);"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Report
+                </button>
+            </form>
+            <div class="modal-footer" style="margin-top:16px;font-size:12px;color:var(--text-muted);">
+                <i class="fas fa-envelope"></i> Reports are sent directly to our support team
+            </div>
+        </div>
+    </div>
+
+    <!-- Season Episodes Modal -->
+    <div class="modal-overlay" id="season-modal">
+        <div class="modal modal-wide">
+            <button class="modal-close" onclick="closeSeasonModal()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h2 id="season-title">Season 1</h2>
+            </div>
+            <div class="episodes-list" id="episodes-list"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="utils.js"></script>
+    <script src="components.js"></script>
+    <script src="router.js"></script>
+    <script src="home.js"></script>
+    <script src="discover.js"></script>
+    <script src="tv.js"></script>
+    <script src="search.js"></script>
+    <script src="library.js"></script>
+    <script src="detail.js"></script>
+    <script src="ai.js"></script>
+    <script src="app.js"></script>
+    <script src="liquid-glass.js"></script>
+
+    <!-- Ad Network Integration - Edit ads-config.js with your publisher ID -->
+    <script src="ads-config.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js', { scope: './' })
+                .then(reg => console.log('SW registered:', reg.scope))
+                .catch(err => console.log('SW failed:', err));
+        }
+    </script>
+
+    <!-- Install Instructions Modal -->
+    <div class="modal-overlay" id="install-instructions-modal">
+        <div class="modal modal-wide">
+            <button class="modal-close" onclick="UI.hideModal('install-instructions-modal')"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <div class="modal-logo">🎬 On<span>Box</span></div>
+                <h2 id="install-instructions-title">Install OnBox</h2>
+                <p>Follow these simple steps to install</p>
+            </div>
+            <div class="install-instructions-content" id="install-instructions-content"></div>
+            <div style="padding:0 20px 20px;">
+                <button class="btn btn-primary" style="width:100%;" onclick="UI.hideModal('install-instructions-modal')">
+                    <i class="fas fa-check"></i> Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function(){
+  var splash=document.getElementById('onbox-splash');
+  function hide(){ if(!splash) return; splash.classList.add('splash-hidden'); setTimeout(function(){splash.remove();},650); }
+  if(document.readyState==='complete') setTimeout(hide,350);
+  else window.addEventListener('load',function(){setTimeout(hide,350);},{once:true});
+  setTimeout(hide,3000);
+})();
+</script>
+     <!-- ✅ PWA Install Script -->
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = "block";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("App installed");
+      }
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
+
+    window.addEventListener("appinstalled", () => {
+      console.log("PWA installed");
+      installBtn.style.display = "none";
+    });
+  </script>
+
+  <!-- ✅ Service Worker Registration -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch((err) => console.error("SW registration failed:", err));
+      });
+    }
+  </script>
+</body>
+</html>
