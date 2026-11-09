@@ -89,29 +89,12 @@
     }
 
     function scan() {
-        document.querySelectorAll('.movie-card, .continue-card, .cast-card').forEach(card => {
+        // Only cards are tinted now: the colour feeds the play buttons.
+        document.querySelectorAll('.movie-card, .continue-card').forEach(card => {
             const img = card.querySelector('img');
             if (img) tint(card, img.currentSrc || img.src);
         });
-        const hero = document.querySelector('.hero');
-        if (hero) {
-            const slide = hero.querySelector('.hero-slide.active') || hero.querySelector('.hero-slide');
-            if (slide) tint(hero, bgUrl(slide), true);
-        }
-        const dHero = document.querySelector('.detail-hero');
-        const dPoster = document.getElementById('detail-poster-img');
-        const dBack = document.getElementById('detail-backdrop');
-        if (dPoster && dPoster.src && dPoster.closest('.detail-poster')) {
-            const box = dPoster.closest('.detail-poster');
-            tint(box, dPoster.currentSrc || dPoster.src);
-            if (dHero && box.dataset.lgSrc === (dPoster.currentSrc || dPoster.src)) {
-                extract(box.dataset.lgSrc).then(pal => { paint(dHero, pal); if (isVisible(dHero)) paint(document.documentElement, pal); });
-            }
-        } else if (dHero && dBack) {
-            tint(dHero, bgUrl(dBack), true);
-        }
     }
-    function isVisible(el) { return !!(el && el.offsetParent !== null); }
 
     let queued = false;
     function schedule() {

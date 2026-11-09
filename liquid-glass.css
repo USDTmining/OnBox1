@@ -1,95 +1,98 @@
 /* ============================================
-   ONBOX - Liquid Glass layer (colour-matched)
-   Loaded AFTER styles.css. Colours come from --lg-rgb / --lg-rgb2 / --lg-rgb3,
-   which liquid-glass.js sets per poster / hero / detail page from the artwork.
+   ONBOX - Liquid Glass layer (single clear water-drop look)
+   Loaded AFTER styles.css. Neutral, colourless glass everywhere,
+   except the play buttons, which keep their movie-tinted glass.
    ============================================ */
-:root{--lg-rgb:229,9,20;--lg-rgb2:255,150,150;--lg-rgb3:124,58,237;
- --lg-rim:inset 0 0 0 1px rgba(255,255,255,.3),inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -2px 6px rgba(var(--lg-rgb2),.5),inset 0 0 16px rgba(255,255,255,.1)}
+:root{--lg-rgb:229,9,20;--lg-rgb2:255,150,150;--lg-rgb3:124,58,237;   /* play buttons only */
+ --lg-rim:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 1.5px 1px rgba(255,255,255,.65),inset 0 -2px 5px rgba(255,255,255,.18),inset 0 0 14px rgba(255,255,255,.08);
+ --lg-drop:0 10px 26px -10px rgba(0,0,0,.5)}
 
 /* ---------- 1. Glass surfaces: buttons, chips, icon buttons, pagination ---------- */
 .btn-primary,.btn-secondary,.btn-ghost,.btn-download,.icon-btn,.mobile-icon-btn,.page-btn:not(.dots),.genre-tag,.filter-chip,.season-btn,
-.content-tab,.carousel-nav,.modal-close,.player-close,.social-btn,.install-banner-btn,.ai-generate-btn,.hero-badge,.hero-meta .genre,.movie-rating,.play-btn,.continue-play-overlay,.continue-remove{
+.content-tab,.carousel-nav,.modal-close,.player-close,.social-btn,.install-banner-btn,.ai-generate-btn,.hero-badge,.hero-meta .genre,.movie-rating,.continue-remove{
+ background:linear-gradient(150deg,rgba(255,255,255,.2),rgba(255,255,255,.05) 62%,rgba(255,255,255,.1))!important;
+ -webkit-backdrop-filter:blur(14px) saturate(1.5) brightness(1.08);backdrop-filter:blur(14px) saturate(1.5) brightness(1.08);
+ border:1px solid rgba(255,255,255,.22)!important;color:#fff;
+ box-shadow:var(--lg-rim),var(--lg-drop)!important;
+ text-shadow:0 1px 5px rgba(0,0,0,.35);isolation:isolate}
+.btn-primary,.page-btn.active,.filter-chip.active,.content-tab.active,.season-btn.active{
+ background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,.12) 62%,rgba(255,255,255,.2))!important;
+ border-color:rgba(255,255,255,.4)!important}
+/* smooth highlight that glides across on hover */
+.btn::before,.icon-btn::before,.mobile-icon-btn::before,.page-btn::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+ background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.32) 48%,transparent 62%),linear-gradient(180deg,rgba(255,255,255,.26),transparent 46%);
+ background-size:260% 100%,100% 100%;background-position:130% 0,0 0;transition:background-position .9s cubic-bezier(.4,0,.2,1)}
+.btn:hover::before,.icon-btn:hover::before,.mobile-icon-btn:hover::before,.page-btn:hover::before{background-position:-30% 0,0 0}
+.btn:hover,.icon-btn:hover,.page-btn:hover:not(:disabled),.genre-tag:hover,.carousel-nav:hover{filter:brightness(1.15)}
+.icon-btn,.mobile-icon-btn,.carousel-nav,.modal-close,.player-close{position:relative}
+.movie-rating{color:#ffe27a;z-index:4}
+.fas,.far,.fab{filter:drop-shadow(0 1px 0 rgba(255,255,255,.35))}
+
+/* ---------- Play buttons: kept exactly as approved (movie-tinted glass) ---------- */
+.play-btn,.continue-play-overlay{
  background:linear-gradient(150deg,rgba(var(--lg-rgb),.5),rgba(var(--lg-rgb2),.16) 70%,rgba(var(--lg-rgb3),.14))!important;
  -webkit-backdrop-filter:blur(14px) saturate(1.8) brightness(1.08);backdrop-filter:blur(14px) saturate(1.8) brightness(1.08);
- border:1px solid rgba(255,255,255,.26)!important;color:#fff;
- box-shadow:var(--lg-rim),0 8px 22px -6px rgba(var(--lg-rgb),.55)!important;
+ border:1px solid rgba(255,255,255,.4)!important;color:#fff;z-index:4;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -2px 6px rgba(var(--lg-rgb2),.5),inset 0 0 16px rgba(255,255,255,.1),0 8px 22px -6px rgba(var(--lg-rgb),.55)!important;
  text-shadow:0 1px 6px rgba(0,0,0,.35);isolation:isolate}
-.btn-ghost,.btn-secondary,.genre-tag,.filter-chip,.content-tab,.page-btn:not(.dots):not(.active),.season-btn{
- background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(var(--lg-rgb),.1) 80%)!important}
-.btn-primary,.page-btn.active,.filter-chip.active,.content-tab.active,.season-btn.active{
- background:linear-gradient(150deg,rgba(var(--lg-rgb),.78),rgba(var(--lg-rgb2),.28) 75%,rgba(var(--lg-rgb3),.2))!important}
-/* gloss sheet + travelling highlight on every glass button */
-.btn::before,.icon-btn::before,.mobile-icon-btn::before,.page-btn::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
- background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.4) 48%,transparent 62%),linear-gradient(180deg,rgba(255,255,255,.3),transparent 46%);
- background-size:260% 100%,100% 100%;background-position:130% 0,0 0;transition:background-position .8s ease}
-.btn:hover::before,.icon-btn:hover::before,.mobile-icon-btn:hover::before,.page-btn:hover::before{background-position:-30% 0,0 0}
-.btn:hover,.icon-btn:hover,.page-btn:hover:not(:disabled),.genre-tag:hover,.carousel-nav:hover{filter:brightness(1.18) saturate(1.2)}
-.icon-btn,.mobile-icon-btn,.carousel-nav,.modal-close,.player-close{position:relative}
-.movie-rating{color:#ffe27a;z-index:4}.play-btn{z-index:4;border:1px solid rgba(255,255,255,.4)!important}
+.play-btn .fas,.continue-play-overlay .fas{filter:drop-shadow(0 1px 0 rgba(255,255,255,.45)) drop-shadow(0 0 8px rgba(var(--lg-rgb2),.7))}
 
-/* icons: glass-lit glyphs */
-.fas,.far,.fab{filter:drop-shadow(0 1px 0 rgba(255,255,255,.45)) drop-shadow(0 0 8px rgba(var(--lg-rgb2),.7))}
-.hero-meta .rating i,.movie-rating i{filter:drop-shadow(0 0 6px rgba(255,210,80,.8))}
-
-/* ---------- 2. Navigation: glass bars and bubble icons ---------- */
+/* ---------- 2. Navigation: clear glass bars ---------- */
 .sidebar,.top-navbar,.mobile-header,.bottom-nav{
- background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(var(--lg-rgb),.08))!important;
- -webkit-backdrop-filter:blur(26px) saturate(190%);backdrop-filter:blur(26px) saturate(190%);
- box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(var(--lg-rgb2),.2),0 10px 40px -12px rgba(var(--lg-rgb),.45)}
-.nav-item .nav-icon-wrap{background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(var(--lg-rgb),.12));box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -2px 5px rgba(var(--lg-rgb2),.25);border:1px solid rgba(255,255,255,.12);border-radius:12px}
-.nav-item.active,.bottom-nav-item.active{background:linear-gradient(150deg,rgba(var(--lg-rgb),.7),rgba(var(--lg-rgb2),.22))!important;box-shadow:var(--lg-rim),0 8px 24px -6px rgba(var(--lg-rgb),.6)!important;border:1px solid rgba(255,255,255,.28)!important}
-.nav-item.active .nav-icon-wrap{background:rgba(255,255,255,.2)}
-.bottom-nav-item.active::after{background:rgba(var(--lg-rgb2),1);box-shadow:0 0 10px rgba(var(--lg-rgb2),.9)}
-.user-avatar,.mobile-user-avatar{background:linear-gradient(150deg,rgba(var(--lg-rgb),.9),rgba(var(--lg-rgb3),.8))!important;box-shadow:var(--lg-rim),0 6px 18px -4px rgba(var(--lg-rgb),.6)}
-.search-box input{background:linear-gradient(150deg,rgba(255,255,255,.1),rgba(var(--lg-rgb),.06))!important;-webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);border:1px solid rgba(255,255,255,.22)}
+ background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02))!important;
+ -webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -1px 0 rgba(255,255,255,.08),0 10px 36px -14px rgba(0,0,0,.6)}
+.nav-item .nav-icon-wrap{background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(255,255,255,.04));box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -2px 4px rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:12px}
+.nav-item.active,.bottom-nav-item.active{background:linear-gradient(150deg,rgba(255,255,255,.3),rgba(255,255,255,.1))!important;box-shadow:var(--lg-rim),var(--lg-drop)!important;border:1px solid rgba(255,255,255,.34)!important;color:#fff}
+.nav-item.active .nav-icon-wrap{background:rgba(255,255,255,.18)}
+.search-box input{background:linear-gradient(150deg,rgba(255,255,255,.1),rgba(255,255,255,.03))!important;-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.2)}
 
-/* ---------- 3. Posters & images: a pane of glass over the artwork ---------- */
+/* ---------- 3. Posters & images: one clear pane of water-glass ---------- */
 .movie-poster::after,.continue-poster-wrap::after,.detail-poster::after,.cast-card::before{
  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
  background:
-  linear-gradient(115deg,transparent 36%,rgba(255,255,255,.34) 48%,transparent 60%),
-  radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.34),transparent 48%),
-  linear-gradient(180deg,transparent 55%,rgba(var(--lg-rgb),.3));
+  linear-gradient(115deg,transparent 36%,rgba(255,255,255,.26) 48%,transparent 60%),
+  radial-gradient(120% 70% at 18% 0%,rgba(255,255,255,.3),transparent 46%),
+  linear-gradient(0deg,rgba(255,255,255,.12),transparent 24%);
  background-size:300% 100%,100% 100%,100% 100%;background-position:130% 0,0 0,0 0;
- box-shadow:inset 0 0 0 1px rgba(255,255,255,.34),inset 0 2px 2px rgba(255,255,255,.65),inset 0 -12px 24px -8px rgba(var(--lg-rgb2),.6),inset 0 0 28px rgba(var(--lg-rgb),.28);
- -webkit-backdrop-filter:blur(.5px) saturate(1.4) brightness(1.05);backdrop-filter:blur(.5px) saturate(1.4) brightness(1.05);
- transition:background-position 1s ease}
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),inset 0 2px 2px rgba(255,255,255,.6),inset 0 -10px 20px -10px rgba(255,255,255,.4),inset 0 0 26px rgba(255,255,255,.08);
+ -webkit-backdrop-filter:blur(.4px) saturate(1.2) brightness(1.04);backdrop-filter:blur(.4px) saturate(1.2) brightness(1.04);
+ transition:background-position 1.1s cubic-bezier(.4,0,.2,1)}
 .movie-card:hover .movie-poster::after,.continue-card:hover .continue-poster-wrap::after,.detail-poster:hover::after,.cast-card:hover::before{background-position:-30% 0,0 0,0 0}
-/* iridescent rim taken from the poster's own colours */
+/* thin specular edge: bright top-left and bottom-right, like a single drop */
 .movie-poster::before,.continue-poster-wrap::before,.detail-poster::before{
- content:"";position:absolute;inset:0;padding:3px;border-radius:inherit;pointer-events:none;z-index:3;opacity:.75;filter:blur(1.2px);
- background:conic-gradient(from 200deg,rgba(var(--lg-rgb2),1),#fff,rgba(var(--lg-rgb3),.9),rgba(255,255,255,.3),rgba(var(--lg-rgb),1),#fff,rgba(var(--lg-rgb2),1));
+ content:"";position:absolute;inset:0;padding:2px;border-radius:inherit;pointer-events:none;z-index:3;opacity:.85;filter:blur(.6px);
+ background:conic-gradient(from 0deg,rgba(255,255,255,.2),rgba(255,255,255,.9) 12%,rgba(255,255,255,.15) 28%,rgba(255,255,255,.08) 45%,rgba(255,255,255,.75) 62%,rgba(255,255,255,.15) 80%,rgba(255,255,255,.2));
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 .movie-poster,.continue-poster-wrap{position:relative}
-.movie-poster .poster-overlay{z-index:1}.continue-play-overlay{z-index:4}.continue-progress{z-index:4}
-.movie-card:hover .movie-poster{box-shadow:0 22px 50px -10px rgba(var(--lg-rgb),.65),0 0 0 1px rgba(255,255,255,.2)}
-.movie-card:hover .movie-info h3{color:rgb(var(--lg-rgb2))}
-.continue-progress-bar{background:linear-gradient(90deg,rgba(var(--lg-rgb),1),rgba(var(--lg-rgb2),1));box-shadow:0 0 10px rgba(var(--lg-rgb2),.9)}
+.movie-poster .poster-overlay{z-index:1}.continue-progress{z-index:4}
 .cast-card{position:relative}
 .cast-card::before{right:0;bottom:auto;aspect-ratio:1;height:auto;border-radius:50%}
-.cast-card img{border-color:rgba(255,255,255,.3)}
-.detail-poster{box-shadow:0 30px 80px -10px rgba(var(--lg-rgb),.6),0 0 0 1px rgba(255,255,255,.2)}
-.detail-hero .backdrop::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
- background:radial-gradient(60% 55% at 0% 100%,rgba(var(--lg-rgb),.35),transparent),radial-gradient(50% 50% at 100% 0,rgba(var(--lg-rgb2),.25),transparent)}
+.cast-card img{border-color:rgba(255,255,255,.28)}
 
-/* ---------- 4. Hero banner: glass frame + glass info panel ---------- */
+/* ---------- 4. Hero banner: clear glass frame + glass info panel ---------- */
 .hero::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:4;pointer-events:none;
- background:radial-gradient(45% 55% at 0% 100%,rgba(var(--lg-rgb),.4),transparent 70%),radial-gradient(40% 50% at 100% 0%,rgba(var(--lg-rgb2),.32),transparent 70%),radial-gradient(35% 40% at 100% 100%,rgba(var(--lg-rgb3),.28),transparent 70%),linear-gradient(135deg,rgba(255,255,255,.16),transparent 22%);
- box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4),inset 0 3px 3px rgba(255,255,255,.55),inset 0 -14px 34px -10px rgba(var(--lg-rgb2),.65),inset 0 0 70px rgba(var(--lg-rgb),.22)}
-.hero::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-40%;width:22%;z-index:5;pointer-events:none;transform:rotate(20deg);filter:blur(10px);mix-blend-mode:screen;
- background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:lg-sweep 9s ease-in-out 1.5s infinite}
+ background:linear-gradient(135deg,rgba(255,255,255,.16),transparent 24%),linear-gradient(315deg,rgba(255,255,255,.1),transparent 20%);
+ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.34),inset 0 3px 3px rgba(255,255,255,.5),inset 0 -12px 30px -10px rgba(255,255,255,.3),inset 0 0 60px rgba(255,255,255,.06)}
+.hero::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-40%;width:20%;z-index:5;pointer-events:none;transform:rotate(20deg);filter:blur(10px);mix-blend-mode:screen;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.24),transparent);animation:lg-sweep 10s ease-in-out 1.5s infinite}
 @keyframes lg-sweep{0%{left:-40%}30%,100%{left:130%}}
-.hero{box-shadow:0 30px 90px -20px rgba(var(--lg-rgb),.55),0 0 0 1px rgba(255,255,255,.18)}
 .hero-content::before{content:"";position:absolute;inset:26px 28px 22px;border-radius:30px;z-index:-1;
- background:linear-gradient(140deg,rgba(var(--lg-rgb),.3),rgba(0,0,0,.34) 70%);
- -webkit-backdrop-filter:blur(18px) saturate(1.7);backdrop-filter:blur(18px) saturate(1.7);
- box-shadow:var(--lg-rim),0 20px 50px -18px rgba(var(--lg-rgb),.6)}
-.hero-indicator.active{background:linear-gradient(90deg,rgba(var(--lg-rgb2),1),#fff)!important;box-shadow:0 0 12px rgba(var(--lg-rgb2),1)!important}
+ background:linear-gradient(140deg,rgba(255,255,255,.12),rgba(0,0,0,.3) 70%);
+ -webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+ box-shadow:var(--lg-rim),0 20px 50px -20px rgba(0,0,0,.7)}
+.hero-indicator.active{background:#fff!important;box-shadow:0 0 10px rgba(255,255,255,.7)!important}
 .hero-indicator{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 
-/* ---------- 5. Modals & player chrome ---------- */
-.modal{background:linear-gradient(150deg,rgba(255,255,255,.1),rgba(var(--lg-rgb),.1))!important;-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);box-shadow:var(--lg-rim),0 30px 80px -20px rgba(var(--lg-rgb),.5)!important;border:1px solid rgba(255,255,255,.2)}
+/* ---------- 5. Modals ---------- */
+.modal{background:linear-gradient(150deg,rgba(255,255,255,.1),rgba(255,255,255,.03))!important;-webkit-backdrop-filter:blur(28px) saturate(160%);backdrop-filter:blur(28px) saturate(160%);box-shadow:var(--lg-rim),0 30px 80px -24px rgba(0,0,0,.7)!important;border:1px solid rgba(255,255,255,.18)}
+
+/* ---------- Light theme: frosted white glass with dark text ---------- */
+[data-theme="light"] .btn-primary,[data-theme="light"] .btn-secondary,[data-theme="light"] .btn-ghost,[data-theme="light"] .icon-btn,[data-theme="light"] .mobile-icon-btn,
+[data-theme="light"] .page-btn:not(.dots),[data-theme="light"] .genre-tag,[data-theme="light"] .filter-chip,[data-theme="light"] .season-btn,[data-theme="light"] .content-tab,
+[data-theme="light"] .carousel-nav{background:linear-gradient(150deg,rgba(255,255,255,.75),rgba(255,255,255,.35))!important;color:var(--text-primary);text-shadow:none;border-color:rgba(255,255,255,.8)!important;box-shadow:inset 0 1.5px 1px #fff,inset 0 -2px 5px rgba(0,0,0,.05),0 8px 22px -10px rgba(0,0,0,.25)!important}
+[data-theme="light"] .hero .btn,[data-theme="light"] .hero .hero-badge,[data-theme="light"] .hero .genre{color:#fff}
 
 @media (max-width:768px){.hero-content::before{inset:16px 14px 14px;border-radius:24px}}
 @media (prefers-reduced-motion:reduce){.hero::before{animation:none}.btn::before,.icon-btn::before,.page-btn::before,.movie-poster::after{transition:none}}
